@@ -39,13 +39,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.example.background.Constants.CHANNEL_ID;
 import static com.example.background.Constants.DELAY_TIME_MILLIS;
 
 
-final class WorkerUtils {
+public final class WorkerUtils {
     private static final String TAG = WorkerUtils.class.getSimpleName();
 
     /**
@@ -57,7 +58,7 @@ final class WorkerUtils {
      * @param message Message shown on the notification
      * @param context Context needed to create Toast
      */
-    static void makeStatusNotification(String message, Context context) {
+    public static void makeStatusNotification(String message, Context context) {
 
         // Make a channel if necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -98,7 +99,7 @@ final class WorkerUtils {
         try {
             Thread.sleep(DELAY_TIME_MILLIS, 0);
         } catch (InterruptedException e) {
-            Log.d(TAG, e.getMessage());
+            Log.d(TAG, Objects.requireNonNull(e.getMessage()));
         }
     }
 
@@ -109,7 +110,7 @@ final class WorkerUtils {
      * @return Blurred bitmap image
      */
     @WorkerThread
-    static Bitmap blurBitmap(@NonNull Bitmap bitmap,
+    public static Bitmap blurBitmap(@NonNull Bitmap bitmap,
                              @NonNull Context applicationContext) {
 
         RenderScript rsContext = null;
@@ -145,7 +146,7 @@ final class WorkerUtils {
      * @return Uri for temp file with bitmap
      * @throws FileNotFoundException Throws if bitmap file cannot be found
      */
-    static Uri writeBitmapToFile(
+    public static Uri writeBitmapToFile(
             @NonNull Context applicationContext,
             @NonNull Bitmap bitmap) throws FileNotFoundException {
 
