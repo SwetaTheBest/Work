@@ -43,7 +43,13 @@ public class BlurViewModel extends AndroidViewModel {
      * @param blurLevel The amount to blur the image
      */
     void applyBlur(int blurLevel) {
-      workManager.enqueue(OneTimeWorkRequest.from(BlurWorker.class));
+        OneTimeWorkRequest blurRequest =
+                new OneTimeWorkRequest.Builder(BlurWorker.class)
+                .setInputData(createInputDataForUri())
+                .build();
+     // workManager.enqueue(OneTimeWorkRequest.from(BlurWorker.class));
+        workManager.enqueue(blurRequest);
+
     }
 
     private Uri uriOrNull(String uriString) {
