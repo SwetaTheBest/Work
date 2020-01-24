@@ -16,17 +16,19 @@
 
 package com.example.background;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkContinuation;
-import androidx.work.WorkManager;
-
 import android.app.Application;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkContinuation;
+import androidx.work.WorkManager;
+
+import static com.example.background.Constants.IMAGE_MANIPULATION_WORK_NAME;
 import static com.example.background.Constants.KEY_IMAGE_URI;
 
 public class BlurViewModel extends AndroidViewModel {
@@ -47,7 +49,10 @@ public class BlurViewModel extends AndroidViewModel {
 
         //add Work request to cleanup temporary images
         WorkContinuation workContinuation =
-                workManager.beginWith(OneTimeWorkRequest.from(CleanUpWorker.class));
+                workManager.beginUniqueWork
+                        (IMAGE_MANIPULATION_WORK_NAME,
+                                ExistingWorkPolicy.REPLACE,
+                                OneTimeWorkRequest.from(CleanUpWorker.class));
 
         //add work request to blur the image
 
