@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkContinuation;
 import androidx.work.WorkManager;
 
 import android.app.Application;
@@ -43,12 +44,36 @@ public class BlurViewModel extends AndroidViewModel {
      * @param blurLevel The amount to blur the image
      */
     void applyBlur(int blurLevel) {
-        OneTimeWorkRequest blurRequest =
-                new OneTimeWorkRequest.Builder(BlurWorker.class)
-                .setInputData(createInputDataForUri())
+
+        //add Work request to cleanup temporary images
+        WorkContinuation workContinuation =
+                workManager.beginWith(OneTimeWorkRequest.from(CleanUpWorker.class));
+
+        //add work request to blur the image
+
+        for (int i = 0 ; i < blurLevel; i++ ){
+            OneTimeWorkRequest.Builder blurRequestBuilder =
+                   new OneTimeWorkRequest.Builder(BlurWorker.class);
+            if (i == 0){
+                blurRequestBuilder.setInputData(createInputDataForUri());
+            }
+            workContinuation = workContinuation.then(blurRequestBuilder.build());
+        }
+//        OneTimeWorkRequest blurRequest =
+//                new OneTimeWorkRequest.Builder(BlurWorker.class)
+//                .setInputData(createInputDataForUri())
+//                .build();
+//        workContinuation = workContinuation.then(blurRequest);
+
+        //add work request to save image to the file system
+        OneTimeWorkRequest saveRequest =
+                new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
                 .build();
-     // workManager.enqueue(OneTimeWorkRequest.from(BlurWorker.class));
-        workManager.enqueue(blurRequest);
+        workContinuation = workContinuation.then(saveRequest);
+
+        //actually start the work
+        workContinuation.enqueue();
+
 
     }
 
