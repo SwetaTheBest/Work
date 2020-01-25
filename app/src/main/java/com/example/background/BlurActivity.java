@@ -16,16 +16,18 @@
 
 package com.example.background;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.work.WorkInfo;
 
 import com.bumptech.glide.Glide;
 
@@ -63,6 +65,25 @@ public class BlurActivity extends AppCompatActivity {
 
         // Setup blur image file button
         mGoButton.setOnClickListener(view -> mViewModel.applyBlur(getBlurLevel()));
+
+        //show work status added in onCreate
+        mViewModel.getmSavedWorkInfo()
+                .observe(this,
+                        listOfWorkInfos -> {
+                            //if there are no matching work info return
+                            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                                return;
+                            }
+                            WorkInfo workInfo = listOfWorkInfos.get(0);
+                            boolean isFinished = workInfo.getState().isFinished();
+
+                            if (!isFinished) {
+                                showWorkInProgress();
+                            } else {
+                                showWorkFinished();
+                            }
+                        });
+
     }
 
     /**
@@ -86,12 +107,13 @@ public class BlurActivity extends AppCompatActivity {
 
     /**
      * Get the blur level from the radio button as an integer
+     *
      * @return Integer representing the amount of times to blur the image
      */
     private int getBlurLevel() {
         RadioGroup radioGroup = findViewById(R.id.radio_blur_group);
 
-        switch(radioGroup.getCheckedRadioButtonId()) {
+        switch (radioGroup.getCheckedRadioButtonId()) {
             case R.id.radio_blur_lv_1:
                 return 1;
             case R.id.radio_blur_lv_2:

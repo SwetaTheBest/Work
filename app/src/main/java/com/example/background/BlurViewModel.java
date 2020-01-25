@@ -22,25 +22,35 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkContinuation;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
+
+import java.util.List;
 
 import static com.example.background.Constants.IMAGE_MANIPULATION_WORK_NAME;
 import static com.example.background.Constants.KEY_IMAGE_URI;
+import static com.example.background.Constants.TAG_OUTPUT;
 
 public class BlurViewModel extends AndroidViewModel {
 
     private Uri mImageUri;
     private WorkManager workManager;
+    private LiveData<List<WorkInfo>> mSavedWorkInfo;
 
     public BlurViewModel(@NonNull Application application) {
         super(application);
         workManager = WorkManager.getInstance(application);
+        mSavedWorkInfo = workManager.getWorkInfosByTagLiveData(TAG_OUTPUT);
     }
 
+    LiveData<List<WorkInfo>> getmSavedWorkInfo() {
+        return mSavedWorkInfo;
+    }
     /**
      * Create the WorkRequest to apply the blur and save the resulting image
      * @param blurLevel The amount to blur the image
@@ -73,6 +83,7 @@ public class BlurViewModel extends AndroidViewModel {
         //add work request to save image to the file system
         OneTimeWorkRequest saveRequest =
                 new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
+                        .addTag(TAG_OUTPUT)
                 .build();
         workContinuation = workContinuation.then(saveRequest);
 
