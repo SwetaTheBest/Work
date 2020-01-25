@@ -1,4 +1,4 @@
-package com.example.background;
+package com.swetajain.background;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -14,17 +14,17 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.swetajain.background.workers.WorkerUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
-import static java.util.Locale.*;
 
 public class SaveImageToFileWorker extends Worker {
     private static final String TAG = SaveImageToFileWorker.class.getSimpleName();
     private static final String TITLE = "Blurred Image";
     private static final SimpleDateFormat DATE_FORMATTER =
-            new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss z", getDefault());
+            new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss z,Locale.US");
     public SaveImageToFileWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
@@ -34,6 +34,8 @@ public class SaveImageToFileWorker extends Worker {
     public Result doWork() {
         Context applicationContext = getApplicationContext();
         ContentResolver resolver = applicationContext.getContentResolver();
+        WorkerUtils.makeStatusNotification("Saving Image!", applicationContext);
+        WorkerUtils.sleep();
         try{
             String resourceUri = getInputData()
                     .getString(Constants.KEY_IMAGE_URI);

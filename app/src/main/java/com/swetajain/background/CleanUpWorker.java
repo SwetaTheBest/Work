@@ -1,4 +1,4 @@
-package com.example.background;
+package com.swetajain.background;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import com.swetajain.background.workers.WorkerUtils;
 
 import java.io.File;
 
@@ -23,6 +25,9 @@ public class CleanUpWorker extends Worker {
     @Override
     public Result doWork() {
         Context applicationContext = getApplicationContext();
+
+        WorkerUtils.makeStatusNotification("Doing Clean up!", applicationContext);
+        WorkerUtils.sleep();
         try{
             File outputDirectory = new File(applicationContext.getFilesDir(),
                     Constants.OUTPUT_PATH);

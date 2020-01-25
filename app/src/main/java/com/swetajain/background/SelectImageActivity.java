@@ -1,20 +1,8 @@
 /*
- * Copyright (C) 2018 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+Created by Sweta Jain on 25/01/2020
  */
 
-package com.example.background;
+package com.swetajain.background;
 
 import android.Manifest;
 import android.app.Activity;
@@ -23,13 +11,14 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +65,7 @@ public class SelectImageActivity extends AppCompatActivity {
     /** Save the permission request count on a rotate **/
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_PERMISSIONS_REQUEST_COUNT, mPermissionRequestCount);
     }
@@ -130,13 +119,12 @@ public class SelectImageActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_CODE_IMAGE:
-                    handleImageRequestResult(data);
-                    break;
-                default:
-                    Log.d(TAG, "Unknown request code.");
+            if (requestCode == REQUEST_CODE_IMAGE) {
+                handleImageRequestResult(data);
+            } else {
+                Log.d(TAG, "Unknown request code.");
             }
         } else {
             Log.e(TAG, String.format("Unexpected Result code %s", resultCode));

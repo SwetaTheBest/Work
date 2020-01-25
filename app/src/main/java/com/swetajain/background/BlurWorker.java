@@ -1,4 +1,4 @@
-package com.example.background;
+package com.swetajain.background;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -13,9 +13,7 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.background.workers.WorkerUtils;
-
-import java.io.FileNotFoundException;
+import com.swetajain.background.workers.WorkerUtils;
 
 
 public class BlurWorker extends Worker {
@@ -35,6 +33,9 @@ public class BlurWorker extends Worker {
 
 //        Bitmap picture = BitmapFactory.decodeResource(applicationContext.getResources(),
 //                R.drawable.test);
+
+        WorkerUtils.makeStatusNotification(" Doing Blur!", applicationContext);
+        WorkerUtils.sleep();
         try {
             if (TextUtils.isEmpty(resourceUri)) {
                 Log.e(TAG, "Invalid input uri");

@@ -1,20 +1,8 @@
 /*
- * Copyright (C) 2018 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+Created by Sweta Jain on 25/01/2020
  */
 
-package com.example.background;
+package com.swetajain.background;
 
 import android.app.Application;
 import android.net.Uri;
@@ -23,6 +11,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -32,9 +21,9 @@ import androidx.work.WorkManager;
 
 import java.util.List;
 
-import static com.example.background.Constants.IMAGE_MANIPULATION_WORK_NAME;
-import static com.example.background.Constants.KEY_IMAGE_URI;
-import static com.example.background.Constants.TAG_OUTPUT;
+import static com.swetajain.background.Constants.IMAGE_MANIPULATION_WORK_NAME;
+import static com.swetajain.background.Constants.KEY_IMAGE_URI;
+import static com.swetajain.background.Constants.TAG_OUTPUT;
 
 public class BlurViewModel extends AndroidViewModel {
 
@@ -42,13 +31,14 @@ public class BlurViewModel extends AndroidViewModel {
     private WorkManager workManager;
     private LiveData<List<WorkInfo>> mSavedWorkInfo;
 
+
     public BlurViewModel(@NonNull Application application) {
         super(application);
         workManager = WorkManager.getInstance(application);
         mSavedWorkInfo = workManager.getWorkInfosByTagLiveData(TAG_OUTPUT);
     }
 
-    LiveData<List<WorkInfo>> getmSavedWorkInfo() {
+    LiveData<List<WorkInfo>> getSavedWorkInfo() {
         return mSavedWorkInfo;
     }
     /**
@@ -56,6 +46,11 @@ public class BlurViewModel extends AndroidViewModel {
      * @param blurLevel The amount to blur the image
      */
     void applyBlur(int blurLevel) {
+
+        Constraints constraints = new Constraints.Builder()
+                .setRequiresStorageNotLow(true)
+                .setRequiresCharging(true)
+                .build();
 
         //add Work request to cleanup temporary images
         WorkContinuation workContinuation =
@@ -83,6 +78,7 @@ public class BlurViewModel extends AndroidViewModel {
         //add work request to save image to the file system
         OneTimeWorkRequest saveRequest =
                 new OneTimeWorkRequest.Builder(SaveImageToFileWorker.class)
+                        .setConstraints(constraints)
                         .addTag(TAG_OUTPUT)
                 .build();
         workContinuation = workContinuation.then(saveRequest);
@@ -122,4 +118,10 @@ public class BlurViewModel extends AndroidViewModel {
         return dataBuilder.build();
     }
 
+    /*
+      Cancel work using work's unique name
+     */
+    void cancelWork() {
+        workManager.cancelUniqueWork(IMAGE_MANIPULATION_WORK_NAME);
+    }
 }
